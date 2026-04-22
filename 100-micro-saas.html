@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>100 Micro SaaS — No Backend Required</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#f5f0e8;
+  --ink:#0f0e0a;
+  --paper:#fffdf7;
+  --rule:#d4cdb8;
+  --accent:#e8380d;
+  --accent2:#1a6b3c;
+  --accent3:#1b4fd8;
+  --muted:#7a7264;
+  --tag-bg:#0f0e0a;
+  --tag-text:#f5f0e8;
+}
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Manrope',sans-serif;
+  min-height:100vh;
+  position:relative;
+}
+
+/* Newspaper texture overlay */
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 24px,rgba(0,0,0,0.04) 24px,rgba(0,0,0,0.04) 25px);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* Halftone dot pattern */
+body::before{
+  content:'';
+  position:fixed;
+  top:0;right:0;
+  width:300px;height:300px;
+  background-image:radial-gradient(circle,rgba(232,56,13,0.12) 1px,transparent 1px);
+  background-size:12px 12px;
+  pointer-events:none;
+  z-index:0;
+}
+
+.page{
+  max-width:1300px;
+  margin:0 auto;
+  padding:0 32px 80px;
+  position:relative;
+  z-index:1;
+}
+
+/* MASTHEAD */
+.masthead{
+  border-bottom:4px double var(--ink);
+  padding:40px 0 24px;
+  margin-bottom:0;
+}
+
+.masthead-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  margin-bottom:12px;
+}
+
+.byline{
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+
+.issue-meta{
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  color:var(--muted);
+  text-align:right;
+}
+
+.paper-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(60px,10vw,120px);
+  line-height:0.9;
+  letter-spacing:0.02em;
+  color:var(--ink);
+  text-align:center;
+  margin:8px 0;
+}
+
+.paper-title span{color:var(--accent);}
+
+.deck{
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  color:var(--muted);
+  text-align:center;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+  padding:8px 0;
+  margin-top:12px;
+}
+
+/* TOOLBAR */
+.toolbar{
+  display:flex;
+  gap:0;
+  margin:24px 0 0;
+  border:1.5px solid var(--ink);
+  overflow:hidden;
+  flex-wrap:wrap;
+}
+
+.filter-btn{
+  background:var(--paper);
+  border:none;
+  border-right:1.5px solid var(--ink);
+  color:var(--muted);
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  padding:8px 16px;
+  cursor:pointer;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  transition:all 0.15s;
+  flex:1;
+  min-width:90px;
+}
+
+.filter-btn:last-child{border-right:none;}
+.filter-btn:hover{background:var(--ink);color:var(--bg);}
+.filter-btn.active{background:var(--accent);color:#fff;font-weight:700;}
+
+/* STATS ROW */
+.stats-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  border:1.5px solid var(--ink);
+  border-top:none;
+  margin-bottom:32px;
+}
+
+.stat-box{
+  padding:16px 20px;
+  border-right:1.5px solid var(--ink);
+  background:var(--paper);
+}
+
+.stat-box:last-child{border-right:none;}
+
+.stat-n{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:42px;
+  line-height:1;
+  color:var(--accent);
+}
+
+.stat-l{
+  font-family:'Space Mono',monospace;
+  font-size:9px;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  margin-top:2px;
+}
+
+/* SEARCH */
+.search-row{
+  margin-bottom:28px;
+  display:flex;
+  gap:0;
+}
+
+.search-input{
+  flex:1;
+  border:1.5px solid var(--ink);
+  background:var(--paper);
+  font-family:'Space Mono',monospace;
+  font-size:12px;
+  padding:10px 16px;
+  color:var(--ink);
+  outline:none;
+}
+
+.search-input::placeholder{color:var(--muted);}
+.search-input:focus{border-color:var(--accent);}
+
+.search-label{
+  background:var(--ink);
+  color:var(--bg);
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  padding:10px 16px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:0;
+  border:1.5px solid var(--ink);
+  background:var(--ink);
+}
+
+.card{
+  background:var(--paper);
+  padding:22px 24px;
+  border:0;
+  outline:1px solid var(--ink);
+  cursor:pointer;
+  transition:background 0.15s;
+  position:relative;
+  animation:fadeIn 0.3s ease both;
+}
+
+.card:hover{background:var(--bg);}
+
+.card-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:12px;
+}
+
+.card-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:32px;
+  line-height:1;
+  color:var(--rule);
+}
+
+.card-tag{
+  font-family:'Space Mono',monospace;
+  font-size:9px;
+  padding:3px 8px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  font-weight:700;
+}
+
+.t-productivity{background:#1b4fd8;color:#fff;}
+.t-utility{background:#1a6b3c;color:#fff;}
+.t-developer{background:#0f0e0a;color:#f5f0e8;}
+.t-content{background:#e8380d;color:#fff;}
+.t-finance{background:#7a3800;color:#fff;}
+.t-hr{background:#5a1a6b;color:#fff;}
+.t-education{background:#0a5a6b;color:#fff;}
+.t-health{background:#6b1a2a;color:#fff;}
+
+.card-title{
+  font-size:15px;
+  font-weight:800;
+  color:var(--ink);
+  margin-bottom:6px;
+  line-height:1.3;
+  letter-spacing:-0.01em;
+}
+
+.card-desc{
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.6;
+  margin-bottom:14px;
+  font-family:'Space Mono',monospace;
+}
+
+.card-footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-top:12px;
+  border-top:1px solid var(--rule);
+}
+
+.card-price{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:18px;
+  color:var(--accent2);
+  letter-spacing:0.05em;
+}
+
+.card-effort{
+  font-family:'Space Mono',monospace;
+  font-size:9px;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+}
+
+/* MODAL */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(15,14,10,0.92);
+  z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.2s;
+}
+
+.overlay.open{opacity:1;pointer-events:all;}
+
+.modal{
+  background:var(--paper);
+  border:2px solid var(--ink);
+  max-width:600px;
+  width:100%;
+  max-height:90vh;
+  overflow-y:auto;
+  position:relative;
+  transform:scale(0.96);
+  transition:transform 0.2s;
+}
+
+.overlay.open .modal{transform:scale(1);}
+
+.modal-banner{
+  background:var(--ink);
+  color:var(--bg);
+  padding:20px 28px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.modal-banner-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:48px;
+  line-height:1;
+  color:var(--accent);
+}
+
+.modal-banner-right{
+  text-align:right;
+}
+
+.modal-close{
+  background:var(--accent);
+  border:none;
+  color:#fff;
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  padding:6px 14px;
+  cursor:pointer;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+  display:block;
+  margin-left:auto;
+}
+
+.modal-close:hover{background:#c4290b;}
+
+.modal-body{padding:28px;}
+
+.modal-tag-line{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.modal-title{
+  font-size:24px;
+  font-weight:800;
+  letter-spacing:-0.02em;
+  margin-bottom:4px;
+}
+
+.modal-desc{
+  font-family:'Space Mono',monospace;
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.7;
+  margin-bottom:20px;
+}
+
+.modal-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:var(--ink);
+  border:1.5px solid var(--ink);
+  margin-bottom:20px;
+}
+
+.modal-kv{
+  background:var(--bg);
+  padding:12px 14px;
+}
+
+.modal-kv-l{
+  font-family:'Space Mono',monospace;
+  font-size:9px;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  margin-bottom:3px;
+}
+
+.modal-kv-v{
+  font-size:13px;
+  font-weight:700;
+  color:var(--ink);
+}
+
+.modal-kv-v.red{color:var(--accent);}
+.modal-kv-v.green{color:var(--accent2);}
+.modal-kv-v.blue{color:var(--accent3);}
+
+.modal-section-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:18px;
+  letter-spacing:0.05em;
+  color:var(--ink);
+  border-bottom:2px solid var(--ink);
+  padding-bottom:4px;
+  margin-bottom:10px;
+}
+
+.feature-list{
+  list-style:none;
+  margin-bottom:20px;
+}
+
+.feature-list li{
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  color:var(--muted);
+  padding:5px 0;
+  border-bottom:1px solid var(--rule);
+  display:flex;gap:8px;align-items:flex-start;
+}
+
+.feature-list li::before{content:'▸';color:var(--accent);flex-shrink:0;}
+
+.pain-box{
+  background:var(--ink);
+  color:var(--bg);
+  padding:14px 16px;
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  line-height:1.7;
+  margin-bottom:20px;
+}
+
+.pain-box strong{color:var(--accent);font-weight:400;}
+
+.tech-row{
+  display:flex;gap:6px;flex-wrap:wrap;
+}
+
+.tech-badge{
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  background:var(--bg);
+  border:1px solid var(--rule);
+  padding:3px 10px;
+  color:var(--muted);
+}
+
+/* NO RESULTS */
+.no-results{
+  grid-column:1/-1;
+  text-align:center;
+  padding:80px 20px;
+  background:var(--paper);
+}
+
+.no-results-big{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:80px;
+  color:var(--rule);
+  line-height:1;
+}
+
+.no-results-sub{
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  color:var(--muted);
+  margin-top:8px;
+}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:640px){
+  .paper-title{font-size:52px;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .toolbar{overflow-x:auto;}
+  .filter-btn{min-width:80px;font-size:9px;padding:8px 10px;}
+  .modal-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- MASTHEAD -->
+  <div class="masthead">
+    <div class="masthead-top">
+      <div class="byline">Est. 2026 · Cognisutra Research Desk</div>
+      <div class="issue-meta">Vol. I · Issue 100<br>No Backend. No Server. No Excuses.</div>
+    </div>
+    <div class="paper-title">MICRO<span>SAAS</span><br>GAZETTE</div>
+    <div class="deck">100 ideas · client-side only · localStorage · AI APIs · zero server cost · ship in a weekend</div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="toolbar">
+    <button class="filter-btn active" data-f="all">All 100</button>
+    <button class="filter-btn" data-f="productivity">Productivity</button>
+    <button class="filter-btn" data-f="developer">Developer</button>
+    <button class="filter-btn" data-f="content">Content</button>
+    <button class="filter-btn" data-f="finance">Finance</button>
+    <button class="filter-btn" data-f="hr">HR / Ops</button>
+    <button class="filter-btn" data-f="utility">Utility</button>
+    <button class="filter-btn" data-f="education">Education</button>
+    <button class="filter-btn" data-f="health">Health</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-n" id="visible-count">100</div><div class="stat-l">Ideas Listed</div></div>
+    <div class="stat-box"><div class="stat-n">₹0</div><div class="stat-l">Server Cost</div></div>
+    <div class="stat-box"><div class="stat-n">8</div><div class="stat-l">Categories</div></div>
+    <div class="stat-box"><div class="stat-n">∞</div><div class="stat-l">Scale Potential</div></div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-row">
+    <span class="search-label">Search</span>
+    <input type="text" class="search-input" id="search" placeholder="e.g. invoice, resume, hotel, regex...">
+  </div>
+
+  <!-- GRID -->
+  <div class="grid" id="grid"></div>
+
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <div class="modal-banner">
+      <div class="modal-banner-num" id="m-num">01</div>
+      <div class="modal-banner-right">
+        <button class="modal-close" id="modal-close">✕ Close</button>
+        <div id="m-tag"></div>
+      </div>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const IDEAS = [
+  // ── PRODUCTIVITY (1–15) ──────────────────────────────────────────────
+  {id:1,cat:"productivity",title:"Daily Standup Writer",price:"₹149/mo",effort:"1 day",audience:"Remote teams, devs",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API","localStorage"],desc:"Answer 3 questions each morning → auto-generate your standup update in Slack/email format.",pain:"Remote teams waste 10 min each writing standups. Most are identical every day.",features:["3-question daily form","Format selector (Slack/email/Notion)","History log (localStorage)","One-click copy"]},
+  {id:2,cat:"productivity",title:"Weekly Review Template Engine",price:"₹199/mo",effort:"2 days",audience:"Founders, managers",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage","Claude API"],desc:"Guided weekly review with AI-written reflection prompts. Tracks wins, blockers, next week goals.",pain:"People know they should do weekly reviews but blank pages kill the habit.",features:["Guided prompt flow","AI-generated reflection","Streak tracker","Export to PDF/Notion"]},
+  {id:3,cat:"productivity",title:"Pomodoro + Task Logger",price:"₹99 one-time",effort:"1 day",audience:"Students, freelancers",monetize:"One-time",revenue:"One-time unlock",tech:["HTML/JS","localStorage","Web Audio API"],desc:"Pomodoro timer with task tagging. Logs focus time per project. Weekly chart.",pain:"Pomodoro apps don't track what you actually worked on. Zero accountability.",features:["Task tagging per session","Daily/weekly focus chart","Custom timer lengths","Export CSV log"]},
+  {id:4,cat:"productivity",title:"Decision Journal",price:"₹299/mo",effort:"3 days",audience:"Founders, managers",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage","html2pdf.js"],desc:"Log important decisions with context, options considered, and expected outcome. Review later.",pain:"People make the same mistakes repeatedly. No one records *why* they decided something.",features:["Decision entry form","Outcome review prompts","Searchable history","PDF export"]},
+  {id:5,cat:"productivity",title:"Meeting Prep Assistant",price:"₹199/mo",effort:"2 days",audience:"Managers, consultants",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Enter who you're meeting + topic → get briefing points, questions to ask, and desired outcomes.",pain:"People go into meetings unprepared. 30 sec of AI prep = 10x better outcome.",features:["Context form","AI-generated prep brief","Question bank","Copy to notes"]},
+  {id:6,cat:"productivity",title:"Habit Streak Tracker (Minimal)",price:"₹99 one-time",effort:"2 days",audience:"General public",monetize:"One-time",revenue:"Freemium",tech:["React","localStorage"],desc:"Track up to 5 habits. No login. Offline first. GitHub-style heatmap.",pain:"Every habit app is bloated with features and requires signup.",features:["5 habits max","GitHub-style heatmap","Streak counter","Dark/light theme"]},
+  {id:7,cat:"productivity",title:"OKR Tracker",price:"₹499/quarter",effort:"4 days",audience:"Startup founders, team leads",monetize:"Quarterly sub",revenue:"Per-user",tech:["React","localStorage","Recharts"],desc:"Set quarterly OKRs, update key results weekly. Visual confidence dashboard.",pain:"OKR spreadsheets have zero visual accountability.",features:["OKR tree view","Weekly check-ins","Confidence slider","PDF quarterly report"]},
+  {id:8,cat:"productivity",title:"Meeting Agenda Generator",price:"Free + upsell",effort:"1 day",audience:"Managers",monetize:"Freemium",revenue:"Team plan ₹499/mo",tech:["HTML/JS","Claude API","mailto:"],desc:"Enter meeting type + attendees → structured agenda with time blocks. Email-ready.",pain:"67% of meetings have no agenda. Average 47 minutes wasted.",features:["Meeting type templates","Time blocks","One-click email draft","Copy markdown"]},
+  {id:9,cat:"productivity",title:"SOP Generator for Small Biz",price:"₹299/mo",effort:"3 days",audience:"SMB owners, hotel managers",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API","html2pdf.js"],desc:"Describe a process → AI writes a professional SOP document. Download as PDF.",pain:"Small businesses run on tribal knowledge. No documented SOPs.",features:["Department selector","AI-written SOP","Step numbering","Branded PDF output"]},
+  {id:10,cat:"productivity",title:"Focus Mode Browser Page",price:"₹99 one-time",effort:"1 day",audience:"Developers, students",monetize:"One-time",revenue:"Extension/one-time",tech:["Chrome Extension","localStorage"],desc:"Replace new tab with a distraction-free focus page: one goal, timer, blocked sites list.",pain:"New tab pages are distraction portals. People lose focus instantly.",features:["One daily goal","Pomodoro timer","Blocked sites reminder","Motivational quote"]},
+  {id:11,cat:"productivity",title:"Project Status Page Generator",price:"₹299/mo",effort:"3 days",audience:"Freelancers, small agencies",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage","GitHub Pages"],desc:"Create a shareable project status page. Update milestones. Share link with clients.",pain:"Clients constantly ask 'what's the status?' Freelancers have no clean answer.",features:["Milestone tracker","Status badges","Shareable URL","Auto-progress %"]},
+  {id:12,cat:"productivity",title:"End-of-Day Summary Writer",price:"₹149/mo",effort:"1 day",audience:"Remote workers",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Log what you did today → AI writes a clean EOD summary for your manager/client.",pain:"Writing EOD reports is repetitive and time-consuming.",features:["Task dump input","Tone selector (formal/casual)","Copy/email output","Daily log history"]},
+  {id:13,cat:"productivity",title:"1-Page Business Plan Builder",price:"₹499 one-time",effort:"3 days",audience:"Aspiring founders, MBA students",monetize:"One-time",revenue:"One-time unlock",tech:["HTML/JS","Claude API","html2pdf.js"],desc:"Answer 10 guided questions → get a clean 1-page business plan PDF.",pain:"Business plan templates are 30-page monsters. Founders need a 1-pager to think clearly.",features:["10-question wizard","AI-enhanced answers","Clean PDF layout","Share link"]},
+  {id:14,cat:"productivity",title:"Thought Organizer / Brain Dump",price:"₹149/mo",effort:"2 days",audience:"Knowledge workers, students",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage","Claude API"],desc:"Dump all your thoughts → AI clusters them into themes and action items.",pain:"Mental clarity is a productivity superpower. People have no structured dump tool.",features:["Free-form text dump","AI clustering","Action item extraction","Export to Notion/md"]},
+  {id:15,cat:"productivity",title:"Delegation Planner",price:"₹299/mo",effort:"2 days",audience:"Managers, team leads",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage"],desc:"List your tasks → AI scores which to delegate, defer, do, or delete using Eisenhower matrix.",pain:"Managers do work that should be delegated. No visual prioritization tool.",features:["Task urgency/importance input","2x2 matrix output","Team assignment fields","Export to email"]},
+
+  // ── DEVELOPER (16–30) ────────────────────────────────────────────────
+  {id:16,cat:"developer",title:"JSON ↔ CSV Converter",price:"₹499 one-time",effort:"1 day",audience:"Developers, analysts",monetize:"One-time",revenue:"Donation/one-time",tech:["Pure HTML/JS","Blob download"],desc:"Paste any JSON → preview as table → download CSV. Or reverse. Zero data leaves browser.",pain:"Developers constantly bounce between tools. Privacy-sensitive data can't go online.",features:["Nested JSON flattening","Custom delimiter","Column reorder","Dark mode"]},
+  {id:17,cat:"developer",title:"Regex Builder with AI Explainer",price:"₹299 one-time",effort:"2 days",audience:"Developers, QA",monetize:"One-time",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Write or paste regex → plain English explanation + live test area with match highlights.",pain:"Every developer Googles regex. No tool that explains AND lets you test simultaneously.",features:["Live match highlighter","Pattern library","AI plain-English explainer","Copy & export"]},
+  {id:18,cat:"developer",title:"Cron Expression Explainer",price:"Free/sponsor",effort:"Half day",audience:"Backend devs, DevOps",monetize:"Sponsor",revenue:"Sponsor/job board",tech:["Pure JS","cronstrue.js"],desc:"Paste a cron expression → human-readable translation + next 10 run times.",pain:"'0 */6 * * *' — no developer reads this without Googling.",features:["Human explainer","Next run list","Timezone converter","Common presets library"]},
+  {id:19,cat:"developer",title:"SLA / Uptime Calculator",price:"Free/sponsor",effort:"Half day",audience:"DevOps, CTOs",monetize:"Sponsor",revenue:"Sponsor",tech:["Pure HTML/JS"],desc:"Enter SLA % → see allowed downtime in minutes per day/week/month/year.",pain:"Every DevOps engineer Googles '99.9% SLA minutes' every 3 months.",features:["Multi-period view","99.9 vs 99.99 compare","Share URL","Copy table"]},
+  {id:20,cat:"developer",title:"API Response Diff Tool",price:"Free/OSS",effort:"2 days",audience:"Backend devs, QA",monetize:"OSS",revenue:"Consulting upsell",tech:["React","jsondiffpatch"],desc:"Paste two JSON responses → see exactly what changed. Color-coded diff.",pain:"Comparing API response changes manually is tedious. No clean standalone tool.",features:["Syntax-highlighted diff","Added/removed labels","Collapse unchanged","Copy patch"]},
+  {id:21,cat:"developer",title:"HTTP Status Code Reference",price:"Free/sponsor",effort:"1 day",audience:"Developers",monetize:"Sponsor",revenue:"Ad/sponsor",tech:["Pure HTML/JS"],desc:"Instant search for HTTP status codes with descriptions, examples, and use cases.",pain:"Developers Google '422 HTTP status code' 3x per week.",features:["Instant search","Code + description","Copy as comment","Dark mode"]},
+  {id:22,cat:"developer",title:"Color Contrast Checker",price:"Free",effort:"1 day",audience:"Developers, designers",monetize:"Free/sponsor",revenue:"Sponsor",tech:["Pure HTML/JS"],desc:"Enter two HEX colors → get WCAG AA/AAA pass/fail scores instantly.",pain:"Accessibility is legally required. Most devs ship inaccessible color combos.",features:["WCAG AA/AAA checker","Color picker","Suggestion mode","Export CSS vars"]},
+  {id:23,cat:"developer",title:"Base64 Encoder/Decoder",price:"Free/sponsor",effort:"Half day",audience:"Developers",monetize:"Sponsor",revenue:"Sponsor",tech:["Pure HTML/JS"],desc:"Encode/decode Base64, URL-safe Base64, and Base64 from images. 100% in-browser.",pain:"Privacy-sensitive data goes through online encoders. Insecure.",features:["Text + file input","URL-safe variant","Image preview","Copy button"]},
+  {id:24,cat:"developer",title:"Git Commit Message Generator",price:"₹199/mo",effort:"2 days",audience:"Developers",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Paste your git diff → get 3 conventional commit messages ranked by quality.",pain:"'fix stuff' and 'WIP' are terrible commit messages. No one wants to write them.",features:["Diff paste input","3 message variants","Conventional commits format","Copy to terminal"]},
+  {id:25,cat:"developer",title:"CSS Gradient Generator",price:"Free/sponsor",effort:"1 day",audience:"Frontend devs, designers",monetize:"Sponsor",revenue:"Sponsor/donation",tech:["Pure HTML/JS"],desc:"Visual gradient builder with live preview. Copy CSS in one click. 10+ gradient types.",pain:"CSS gradients are annoying to write by hand. Existing tools are cluttered.",features:["Linear/radial/conic/mesh","Live preview","Copy CSS","Palette inspiration mode"]},
+  {id:26,cat:"developer",title:"Tech Stack Picker",price:"₹299 one-time",effort:"3 days",audience:"Developers, founders",monetize:"One-time",revenue:"Freemium",tech:["React","Claude API"],desc:"Answer 5 questions about your project → get a recommended tech stack with reasoning.",pain:"Junior devs waste weeks choosing the wrong stack. No guided decision tool.",features:["Project type questionnaire","AI-recommended stack","Trade-off explanation","Shareable result"]},
+  {id:27,cat:"developer",title:"README Generator",price:"₹149/mo",effort:"2 days",audience:"Open-source devs",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Enter project name + description → get a complete, beautiful README.md in seconds.",pain:"Most GitHub repos have terrible READMEs. First impressions kill adoption.",features:["Project description input","AI-generated README","Badges section","Raw markdown copy"]},
+  {id:28,cat:"developer",title:"dotenv File Generator",price:"Free",effort:"Half day",audience:"Developers",monetize:"Sponsor",revenue:"Sponsor",tech:["Pure HTML/JS"],desc:"Input your environment variables → generate a clean .env and .env.example file.",pain:"Developers forget to create .env.example. New devs can't set up the project.",features:[".env input form","Auto-generate .env.example","Download both files","Comment generator"]},
+  {id:29,cat:"developer",title:"SQL Query Formatter & Explainer",price:"₹299/mo",effort:"2 days",audience:"Developers, data analysts",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API","sql-formatter.js"],desc:"Paste ugly SQL → get formatted query + plain-English explanation of what it does.",pain:"Raw SQL from ORMs is unreadable. No tool formats AND explains simultaneously.",features:["Auto-format SQL","AI explanation","Performance suggestions","Copy formatted"]},
+  {id:30,cat:"developer",title:"Package.json Dependency Auditor",price:"Free/OSS",effort:"2 days",audience:"Node.js developers",monetize:"OSS",revenue:"GitHub sponsors",tech:["React","npm registry API (public)"],desc:"Paste your package.json → see outdated packages, license risks, and bundle size estimates.",pain:"Devs ignore dependencies until they become security liabilities.",features:["Outdated version check","License badge","Size estimate","Update priority sort"]},
+
+  // ── CONTENT (31–45) ──────────────────────────────────────────────────
+  {id:31,cat:"content",title:"LinkedIn Post Formatter",price:"₹199/mo",effort:"2 days",audience:"Founders, personal brands",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API","Clipboard API"],desc:"Write your LinkedIn post → AI adds hooks, line breaks, emojis, and CTA. Copy instantly.",pain:"LinkedIn's editor is bad. Most posts look like walls of text. Engagement tanks.",features:["Auto-hook generator","Unicode bold/italic","Character + engagement score","3 format templates"]},
+  {id:32,cat:"content",title:"Instagram Caption Generator",price:"₹99/mo",effort:"1 day",audience:"Creators, small biz",monetize:"Monthly sub",revenue:"₹99/mo unlimited",tech:["HTML/JS","Claude API"],desc:"Describe your post → 5 caption options with hashtags. Hinglish/English/Formal toggle.",pain:"Writing captions daily is exhausting. Most creators reuse the same 5.",features:["Niche selector","Tone toggle (Hinglish/EN)","Hashtag sets","Copy to clipboard"]},
+  {id:33,cat:"content",title:"Cold Email Subject Line Tester",price:"₹149/50 tests",effort:"2 days",audience:"Marketers, founders, SDRs",monetize:"Credit packs",revenue:"Pay-per-use",tech:["HTML/JS","Claude API"],desc:"Score your subject line for open rate potential. Get AI rewrites.",pain:"Most cold emails get <10% open rates. Subject line is the #1 variable.",features:["Spam word detector","Length/emoji scoring","A/B variant generator","Winner copy button"]},
+  {id:34,cat:"content",title:"Blog Post Outline Generator",price:"₹199/mo",effort:"1 day",audience:"Bloggers, content marketers",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Enter keyword + audience → get SEO-structured blog outline with H2s and H3s.",pain:"Staring at a blank doc is the biggest content bottleneck.",features:["Keyword + audience input","SEO-structured H2/H3","Introduction hook","Copy as Markdown"]},
+  {id:35,cat:"content",title:"Thread Generator (Twitter/X)",price:"₹199/mo",effort:"2 days",audience:"Creators, founders",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Paste a blog post or idea → get a 10-tweet thread with hooks and CTAs.",pain:"Long-form content goes unread. Twitter threads drive 10x more engagement.",features:["Blog → thread conversion","Hook tweet generator","CTA final tweet","Copy each tweet"]},
+  {id:36,cat:"content",title:"YouTube Description Generator",price:"₹149/mo",effort:"1 day",audience:"YouTubers",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Enter video title + summary → optimized YouTube description with timestamps, tags, CTA.",pain:"YouTube description is the most underused SEO lever for creators.",features:["Title + summary input","SEO-optimized description","Timestamp template","Hashtag suggestions"]},
+  {id:37,cat:"content",title:"Pricing Page Copywriter",price:"₹199/10 gen",effort:"2 days",audience:"SaaS founders, indie hackers",monetize:"Credit packs",revenue:"Pay-per-use",tech:["HTML/JS","Claude API"],desc:"Enter product + pricing → 3 headline + CTA copy variants optimized for conversion.",pain:"Pricing page copy is the #1 conversion bottleneck. Most founders write it in 5 min.",features:["3 variants per run","Conversion principle labels","Direct/benefit/fear frame","Export to Notion"]},
+  {id:38,cat:"content",title:"Freelancer Proposal Generator",price:"₹199/10 proposals",effort:"2 days",audience:"Freelancers, agencies",monetize:"Credit packs",revenue:"Pay-per-use",tech:["HTML/JS","Claude API","html2pdf.js"],desc:"Answer 5 questions → tailored proposal in 10 seconds. Download as PDF.",pain:"Writing proposals takes 30–60 min per client. Most freelancers reuse bad templates.",features:["Tone selector","Scope + timeline builder","Rate calculator","PDF download"]},
+  {id:39,cat:"content",title:"Tone Checker for Professional Emails",price:"₹149/25 checks",effort:"2 days",audience:"Managers, HR, sales",monetize:"Credit packs",revenue:"Pay-per-use",tech:["HTML/JS","Claude API"],desc:"Paste your email → AI flags rude/passive-aggressive phrases and suggests rewrites.",pain:"People accidentally send rude emails. It kills relationships and deals.",features:["Tone score (1–10)","Problem phrase highlights","Rewrite suggestions","Before/after compare"]},
+  {id:40,cat:"content",title:"Resume Bullet Upgrader",price:"₹199/50 credits",effort:"Weekend",audience:"Job seekers, freshers",monetize:"Credit packs",revenue:"Freemium",tech:["HTML/JS","Claude API","html2pdf.js"],desc:"Paste weak resume bullets → power-action rewrites using AI. Export as PDF.",pain:"People don't know how to write impactful resume bullets. Weak verbs cost jobs.",features:["AI-powered rewrite","Tone selector (fresher/senior)","PDF export","Copy to clipboard"]},
+  {id:41,cat:"content",title:"Font Pairing Explorer",price:"Free + premium",effort:"3 days",audience:"Designers, developers",monetize:"Freemium",revenue:"₹199 premium pack",tech:["React","Google Fonts API","CSS vars"],desc:"Browse 100+ curated heading + body font pairs. Preview with your own copy. Export CSS.",pain:"Font pairing is an art. Developers spend hours guessing on Google Fonts.",features:["100+ curated pairs","Live custom text preview","Mood filters","Copy @import CSS"]},
+  {id:42,cat:"content",title:"Color Palette for Brands",price:"₹299/mo",effort:"2 days",audience:"Designers, founders",monetize:"Monthly sub",revenue:"Freemium",tech:["React","Claude API","Clipboard API"],desc:"Enter brand keywords → full palette with HEX, Tailwind, and CSS variables.",pain:"Color theory is hard. Most founders pick palettes that hurt conversion.",features:["AI mood-to-color","Contrast check","CSS/Tailwind/Figma export","Save locally"]},
+  {id:43,cat:"content",title:"Press Release Generator",price:"₹299/5 releases",effort:"2 days",audience:"Startup founders, PR folks",monetize:"Credit packs",revenue:"Pay-per-use",tech:["HTML/JS","Claude API","html2pdf.js"],desc:"Enter announcement details → professional press release in AP style. Download PDF.",pain:"Startups can't afford PR agencies for small announcements.",features:["AP style formatting","Boilerplate section","Quote generator","PDF + Word download"]},
+  {id:44,cat:"content",title:"Job Description Generator",price:"₹299/10 JDs",effort:"2 days",audience:"HR, startup founders",monetize:"Credit packs",revenue:"Pay-per-use",tech:["HTML/JS","Claude API"],desc:"Enter role + requirements → inclusive, structured job description ready to post.",pain:"Bad JDs attract wrong candidates. Most founders write JDs in 10 minutes.",features:["Role requirements input","Inclusion language check","Salary range template","Copy to clipboard"]},
+  {id:45,cat:"content",title:"WhatsApp Broadcast Message Writer",price:"₹199/mo",effort:"1 day",audience:"Small businesses, hotels",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Describe your offer/announcement → 3 WhatsApp broadcast variants. Emoji optimized.",pain:"Most business WhatsApp broadcasts are generic and get ignored.",features:["Offer description input","3 tone variants","Emoji placement","Character count checker"]},
+
+  // ── FINANCE (46–57) ──────────────────────────────────────────────────
+  {id:46,cat:"finance",title:"GST Invoice Generator",price:"₹299/mo",effort:"3 days",audience:"Freelancers, MSMEs",monetize:"Monthly sub",revenue:"Freemium 5/mo",tech:["HTML/JS","jsPDF","localStorage"],desc:"Create GST-compliant invoices in 60 seconds. No login. Download PDF.",pain:"Freelancers use Word templates with manual tax calculation. Wrong and ugly.",features:["CGST/SGST/IGST auto-calc","Logo upload","Invoice history","WhatsApp share"]},
+  {id:47,cat:"finance",title:"Quotation Builder",price:"₹299/mo",effort:"4 days",audience:"Freelancers, event planners, hotels",monetize:"Monthly sub",revenue:"Monthly",tech:["React","jsPDF","localStorage"],desc:"Multi-line item quotation with GST, discount, branding. Professional PDF in 2 minutes.",pain:"SMBs send quotations on Word or plain WhatsApp. Looks unprofessional.",features:["Line item builder","GST/discount toggle","Logo + letterhead","Client name personalization"]},
+  {id:48,cat:"finance",title:"SIP / Investment Calculator",price:"Free/sponsor",effort:"2 days",audience:"Indian retail investors",monetize:"Sponsor/affiliate",revenue:"Mutual fund referral",tech:["React","Recharts"],desc:"Calculate SIP returns with inflation-adjusted projections. Visual chart.",pain:"Most SIP calculators are ugly and don't show inflation-adjusted numbers.",features:["SIP + lumpsum modes","Inflation adjustment","Goal-based back-calc","Chart + table view"]},
+  {id:49,cat:"finance",title:"Freelancer Tax Estimator (India)",price:"₹299/mo",effort:"3 days",audience:"Indian freelancers",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage"],desc:"Enter annual income → estimate income tax, advance tax dates, and TDS deducted.",pain:"Indian freelancers don't know how much tax to save. Pay penalties at year-end.",features:["Old vs new regime compare","Advance tax schedule","TDS tracker","PDF summary"]},
+  {id:50,cat:"finance",title:"Salary Hike Calculator",price:"Free/sponsor",effort:"1 day",audience:"Salaried employees",monetize:"Sponsor",revenue:"Job board referral",tech:["Pure HTML/JS"],desc:"Enter current CTC + hike % → see new salary breakdown, in-hand estimate, PF impact.",pain:"People negotiate without knowing what a 15% hike actually means in-hand.",features:["CTC breakdown","In-hand estimate","PF/gratuity impact","Compare two offers"]},
+  {id:51,cat:"finance",title:"EMI Calculator with Amortization",price:"Free/sponsor",effort:"1 day",audience:"General public",monetize:"Sponsor",revenue:"Loan affiliate",tech:["React","Recharts"],desc:"Enter loan details → full amortization schedule with interest vs principal breakdown.",pain:"Bank EMI calculators show one number. People don't understand what they're paying.",features:["Full amortization table","Prepayment simulator","Interest savings chart","Download PDF"]},
+  {id:52,cat:"finance",title:"Expense Splitter",price:"₹99 one-time",effort:"2 days",audience:"Friend groups, roommates",monetize:"One-time",revenue:"Freemium",tech:["React","localStorage"],desc:"Add group expenses → auto-calculate who owes whom. Share settlement list.",pain:"Splitwise is overkill for a 3-day trip. People need a simple offline splitter.",features:["Add members + expenses","Settlement calculation","No login required","Export summary"]},
+  {id:53,cat:"finance",title:"Invoice Aging Report Builder",price:"₹499/mo",effort:"3 days",audience:"Freelancers, small agencies",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage","Chart.js"],desc:"Log invoices → auto-flag overdue ones. Aging buckets (0–30, 31–60, 60+). PDF report.",pain:"Freelancers forget which invoices are unpaid. Cash flow suffers.",features:["Invoice log","Aging buckets","Overdue alerts","PDF aging report"]},
+  {id:54,cat:"finance",title:"Break-Even Calculator",price:"Free/sponsor",effort:"1 day",audience:"SMB owners, founders",monetize:"Sponsor",revenue:"Consulting upsell",tech:["Pure HTML/JS","Chart.js"],desc:"Enter fixed costs, variable costs, and price → break-even units and revenue visualized.",pain:"Most small business owners don't know their break-even. They're flying blind.",features:["Fixed + variable inputs","Break-even chart","Margin calculator","Scenario comparison"]},
+  {id:55,cat:"finance",title:"Burn Rate Calculator",price:"Free",effort:"1 day",audience:"Startup founders",monetize:"Sponsor",revenue:"VC newsletter sponsor",tech:["React","Recharts"],desc:"Enter monthly expenses + runway → visualize when you run out of money. Scenario planner.",pain:"Founders discover they're running out of money 2 months before it happens.",features:["Expense categories","Runway chart","Scenario slider","Fundraising milestone marker"]},
+  {id:56,cat:"finance",title:"Business Budget Planner",price:"₹299/mo",effort:"3 days",audience:"Small business owners",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage","Recharts"],desc:"Plan monthly business budget by department. Track actuals vs budget. Alerts on overspend.",pain:"Small businesses have no budget process. They react instead of plan.",features:["Department budgets","Actual vs planned","Overspend alerts","Monthly PDF report"]},
+  {id:57,cat:"finance",title:"Salary Comparison Tool",price:"Free/sponsor",effort:"2 days",audience:"Job seekers, HR",monetize:"Sponsor",revenue:"Job board affiliate",tech:["React","localStorage"],desc:"Compare two job offers side-by-side: CTC, in-hand, benefits, growth, location cost.",pain:"People compare job offers on gut feeling. They miss the full picture.",features:["Side-by-side CTC breakdown","Cost of living adjustment","Benefits scoring","Share comparison link"]},
+
+  // ── HR / OPS (58–68) ─────────────────────────────────────────────────
+  {id:58,cat:"hr",title:"Leave & Attendance Tracker",price:"₹499/mo up to 20",effort:"5 days",audience:"Small hotels, restaurants, SMBs",monetize:"Monthly sub",revenue:"Per-org",tech:["React","localStorage","jsPDF"],desc:"Track employee leave and attendance. CL/SL/EL balances. Monthly PDF report.",pain:"Small businesses track attendance in registers or WhatsApp messages. No analytics.",features:["Staff roster view","Leave type buckets","Monthly summary","Export PDF + CSV"]},
+  {id:59,cat:"hr",title:"Guest Complaint Logger",price:"₹499/property/mo",effort:"4 days",audience:"Hotel front office",monetize:"Monthly sub",revenue:"Per-property",tech:["React PWA","localStorage","jsPDF"],desc:"Log, categorize and track guest complaints by department. Offline-first PWA.",pain:"Hotels track complaints in paper registers. No analytics, no accountability.",features:["Department tagging","Status tracking","Priority levels","Monthly PDF report"]},
+  {id:60,cat:"hr",title:"WhatsApp Auto-Reply Builder",price:"₹299 one-time",effort:"2 days",audience:"Small businesses, hotels",monetize:"One-time",revenue:"One-time",tech:["HTML/JS","localStorage"],desc:"Build structured WhatsApp Business auto-reply messages visually. Copy-paste ready.",pain:"Small businesses spend hours crafting auto-replies. No visual builder exists.",features:["Variable placeholders","Greeting time detection","EN/HI/TA toggle","Export as .txt"]},
+  {id:61,cat:"hr",title:"Staff Duty Roster Generator",price:"₹499/mo",effort:"5 days",audience:"Hotels, restaurants, retail",monetize:"Monthly sub",revenue:"Per-org",tech:["React","localStorage","jsPDF"],desc:"Generate weekly shift rosters for your team. Drag-and-drop assignments. Print PDF.",pain:"Shift planning in WhatsApp or paper is chaos. Staff confusion and no-shows.",features:["Drag-drop shift builder","Staff availability input","Conflict detection","Print/PDF roster"]},
+  {id:62,cat:"hr",title:"Warning Letter Generator",price:"₹199/5 letters",effort:"2 days",audience:"HR managers, hotel GMs",monetize:"Credit packs",revenue:"Pay-per-use",tech:["HTML/JS","Claude API","html2pdf.js"],desc:"Enter employee name + infraction → professional warning letter. Download PDF.",pain:"HR managers spend 45 min writing one warning letter. Templates are inconsistent.",features:["Infraction type selector","Severity levels","Professional language","PDF + print ready"]},
+  {id:63,cat:"hr",title:"Onboarding Checklist Builder",price:"₹299/mo",effort:"3 days",audience:"HR, startup founders",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage"],desc:"Build role-specific onboarding checklists. Track new hire completion. Share link.",pain:"Onboarding is done ad-hoc. New employees waste first week figuring out basics.",features:["Role-based templates","Completion tracking","Share link for new hire","PDF export"]},
+  {id:64,cat:"hr",title:"Exit Interview Question Generator",price:"₹199/5 runs",effort:"1 day",audience:"HR managers",monetize:"Credit packs",revenue:"Pay-per-use",tech:["HTML/JS","Claude API"],desc:"Enter departing employee role + reasons → tailored exit interview question set.",pain:"Exit interviews use generic questions. Companies miss real retention insights.",features:["Role + reason input","20 tailored questions","Sentiment analysis tip","Copy to form"]},
+  {id:65,cat:"hr",title:"KRA/KPI Template Generator",price:"₹299/mo",effort:"3 days",audience:"Managers, HR",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API","html2pdf.js"],desc:"Enter role and department → generate measurable KRAs and KPIs. Download PDF.",pain:"Performance reviews are vague because KPIs were never defined clearly.",features:["Role + department input","AI-generated KRAs/KPIs","SMART criteria check","PDF download"]},
+  {id:66,cat:"hr",title:"Appraisal Form Builder",price:"₹499/mo",effort:"4 days",audience:"HR, small companies",monetize:"Monthly sub",revenue:"Per-org",tech:["React","localStorage","html2pdf.js"],desc:"Build custom appraisal forms. Employees self-rate. Manager rates. Printable PDF.",pain:"Most companies do appraisals on paper or email. No structure, no history.",features:["Self-assessment section","Manager rating section","Score auto-total","PDF appraisal report"]},
+  {id:67,cat:"hr",title:"HR Letter Generator (Offer/Relieving/Exp)",price:"₹199/5 letters",effort:"3 days",audience:"HR managers, founders",monetize:"Credit packs",revenue:"Pay-per-use",tech:["HTML/JS","Claude API","html2pdf.js"],desc:"Select letter type → fill details → get professional HR letter in seconds. PDF download.",pain:"Writing offer/relieving/experience letters takes 30 min each. Inconsistent formatting.",features:["Offer/relieving/exp letter types","Company letterhead","Professional language","PDF download"]},
+  {id:68,cat:"hr",title:"Team Meeting Minutes Generator",price:"₹199/mo",effort:"2 days",audience:"Managers, team leads",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Paste rough meeting notes → AI structures them into clean minutes with action items.",pain:"Meeting minutes are never written or are written poorly. Accountability suffers.",features:["Rough notes input","AI-structured minutes","Action items extracted","Email-ready format"]},
+
+  // ── UTILITY (69–79) ──────────────────────────────────────────────────
+  {id:69,cat:"utility",title:"Password Strength Visualizer",price:"Free/donation",effort:"1 day",audience:"General public",monetize:"Donation",revenue:"Gumroad donation",tech:["Pure JS","zxcvbn"],desc:"See crack-time estimates for your password. Generate strong alternatives. 100% local.",pain:"People use '123456'. They don't understand WHY it's weak.",features:["Crack-time estimate","Pattern weakness highlight","Passphrase generator","100% client-side"]},
+  {id:70,cat:"utility",title:"QR Code Generator",price:"Free/sponsor",effort:"1 day",audience:"Small businesses, marketers",monetize:"Sponsor",revenue:"Sponsor",tech:["HTML/JS","qrcode.js"],desc:"Generate QR codes for URLs, text, WhatsApp, WiFi. Download as PNG/SVG.",pain:"Every QR code tool is wrapped in ads. People want a clean, fast generator.",features:["URL/text/WhatsApp/WiFi modes","Color customization","PNG + SVG download","Logo overlay"]},
+  {id:71,cat:"utility",title:"Unit Converter (Indian focused)",price:"Free/sponsor",effort:"2 days",audience:"General Indian public",monetize:"Sponsor",revenue:"Sponsor",tech:["Pure HTML/JS"],desc:"Convert cents/acres/marla/gaj/bigha for land. Tola/ratti for jewellery. Temperature, weight.",pain:"Indian unit conversions (land, jewellery, cooking) are not on Google Calculator.",features:["Land units (bigha/acre/gaj)","Jewellery units (tola/ratti)","Temperature/weight/volume","Voice input"]},
+  {id:72,cat:"utility",title:"Text Case Converter",price:"Free/sponsor",effort:"Half day",audience:"Developers, writers",monetize:"Sponsor",revenue:"Sponsor",tech:["Pure HTML/JS"],desc:"Convert text between UPPER, lower, Title Case, camelCase, snake_case, kebab-case instantly.",pain:"Developers manually retype variable names. Writers fix case in Word every day.",features:["8 case formats","Instant conversion","Copy button","Character + word count"]},
+  {id:73,cat:"utility",title:"Lorem Ipsum Generator (Desi Edition)",price:"Free",effort:"1 day",audience:"Designers, developers",monetize:"Sponsor",revenue:"Sponsor",tech:["Pure HTML/JS"],desc:"Generate placeholder text in Hindi, Tamil, Telugu, or Hinglish. Paragraph/word/sentence mode.",pain:"Latin placeholder text looks wrong in Indian language app mockups.",features:["5 Indian languages","Word/sentence/paragraph mode","Copy to clipboard","Custom length"]},
+  {id:74,cat:"utility",title:"File Size Estimator",price:"Free",effort:"1 day",audience:"Developers, designers",monetize:"Sponsor",revenue:"Sponsor",tech:["Pure HTML/JS"],desc:"Estimate how file size changes with compression, format conversion, and quality settings.",pain:"Designers send 10MB images in emails. No one estimates size before exporting.",features:["Format comparison table","Quality slider sim","Web vs print estimate","Tips for each format"]},
+  {id:75,cat:"utility",title:"Timezone Meeting Planner",price:"Free/sponsor",effort:"2 days",audience:"Remote teams, freelancers",monetize:"Sponsor",revenue:"Sponsor",tech:["React","Intl API"],desc:"Add 4 team locations → find the best overlap window. Visual 24-hr timeline.",pain:"Remote teams constantly ask 'what time is that for you?' over and over.",features:["City search","24hr overlap view","Best time highlight","Copy meeting link"]},
+  {id:76,cat:"utility",title:"Word Counter / Readability Scorer",price:"Free/sponsor",effort:"1 day",audience:"Writers, students",monetize:"Sponsor",revenue:"Sponsor",tech:["Pure HTML/JS"],desc:"Paste any text → word count, reading time, Flesch-Kincaid score, and grade level.",pain:"Bloggers write without knowing if their content is readable. No quick tool.",features:["Word/char/sentence count","Reading time estimate","Flesch-Kincaid score","Grade level label"]},
+  {id:77,cat:"utility",title:"URL Slug Generator",price:"Free",effort:"Half day",audience:"Developers, bloggers",monetize:"Sponsor",revenue:"Sponsor",tech:["Pure HTML/JS"],desc:"Paste any title → get a URL-safe slug. Multi-language support including Hindi.",pain:"Bloggers manually slugify blog titles. They include spaces or special chars.",features:["Auto slugify","Hindi/Devanagari support","Copy button","Custom separator"]},
+  {id:78,cat:"utility",title:"Markdown to HTML Converter",price:"Free",effort:"Half day",audience:"Developers, writers",monetize:"Sponsor",revenue:"Sponsor",tech:["Pure HTML/JS","marked.js"],desc:"Live Markdown editor with HTML preview and copy output. Supports tables and code blocks.",pain:"Devs paste markdown into HTML editors and get broken output.",features:["Live split preview","Syntax highlighting","Copy HTML output","Download .html"]},
+  {id:79,cat:"utility",title:"Image Compressor (In-Browser)",price:"₹0/free",effort:"2 days",audience:"Bloggers, marketers",monetize:"Donation",revenue:"Donation/sponsor",tech:["HTML/JS","Canvas API"],desc:"Drag-drop images → compress and download. Zero upload. 100% private.",pain:"90% of websites are slow because of unoptimized images. No offline tool.",features:["Drag-drop multi-file","Quality slider","Before/after size","Batch download ZIP"]},
+
+  // ── EDUCATION (80–89) ────────────────────────────────────────────────
+  {id:80,cat:"education",title:"Flashcard Generator from Notes",price:"₹199/mo",effort:"2 days",audience:"Students",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API","localStorage"],desc:"Paste your notes → AI generates flashcard Q&A pairs. Study with spaced repetition.",pain:"Students highlight everything and study nothing. Flashcards work. Making them doesn't.",features:["Note paste input","AI Q&A extraction","Spaced repetition session","Progress tracker"]},
+  {id:81,cat:"education",title:"MCQ Quiz Generator",price:"₹299/mo",effort:"3 days",audience:"Teachers, students",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Enter topic or paste content → AI generates 10 MCQs with answers and explanations.",pain:"Teachers spend 2 hrs creating quiz questions. Students have no practice tool.",features:["Topic or content input","4-option MCQs","Explanation per answer","Export as PDF quiz"]},
+  {id:82,cat:"education",title:"Study Schedule Planner",price:"₹149/mo",effort:"2 days",audience:"Students, exam aspirants",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage"],desc:"Enter exam date + subjects → AI builds a day-by-day study plan with buffers.",pain:"Students start studying 2 days before exams. No planning tool for Indian exams.",features:["Exam date + subjects input","Day-by-day timetable","Buffer days auto-added","Print/export plan"]},
+  {id:83,cat:"education",title:"Concept Explainer (ELI5 Mode)",price:"₹149/mo",effort:"1 day",audience:"Students, professionals",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Enter any concept → get a simple explanation with analogy, then a technical version.",pain:"Complex topics explained by teachers are too abstract. Students need analogies.",features:["ELI5 toggle","Analogy mode","Technical depth slider","Save to notebook"]},
+  {id:84,cat:"education",title:"Vocabulary Builder (GRE/IELTS/CAT)",price:"₹199/mo",effort:"3 days",audience:"Exam aspirants",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage","Claude API"],desc:"Learn 5 new words daily with meaning, example sentence, and usage. Spaced repetition quiz.",pain:"GRE vocabulary is huge. Students use random word lists with zero retention.",features:["5 words/day delivery","Example sentences","Spaced repetition quiz","Streak tracker"]},
+  {id:85,cat:"education",title:"Interview Question Simulator",price:"₹299/mo",effort:"3 days",audience:"Job seekers, college students",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Select role + company type → AI asks interview questions and evaluates your answers.",pain:"People prepare answers but never practice in a simulated environment.",features:["Role + company selector","AI question flow","Answer evaluation","Improvement tips"]},
+  {id:86,cat:"education",title:"Essay Feedback Tool",price:"₹149/5 essays",effort:"2 days",audience:"Students, IELTS/TOEFL aspirants",monetize:"Credit packs",revenue:"Pay-per-use",tech:["HTML/JS","Claude API"],desc:"Paste your essay → get grammar, structure, argument strength, and band score estimate.",pain:"Students submit essays without feedback. They repeat the same mistakes.",features:["Grammar check","Structure analysis","Argument scoring","Band score estimate (IELTS)"]},
+  {id:87,cat:"education",title:"Code Learning Path Generator",price:"₹299/mo",effort:"2 days",audience:"CS students, career switchers",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API"],desc:"Enter your goal (e.g. 'become a backend dev') → get a structured 12-week learning path.",pain:"Beginners get overwhelmed by options. No personalized learning roadmap exists.",features:["Goal input","12-week structured plan","Resource links per week","Progress checkboxes"]},
+  {id:88,cat:"education",title:"Typing Speed Trainer (Indian Languages)",price:"Free/sponsor",effort:"3 days",audience:"Students, government job aspirants",monetize:"Sponsor",revenue:"Sponsor",tech:["React","localStorage"],desc:"Practice typing in Hindi, Tamil, Telugu. WPM tracker. Government exam mode.",pain:"Government job typing tests are in Devanagari/regional scripts. No practice tool.",features:["Hindi/Tamil/Telugu passages","WPM + accuracy tracker","Exam mode timer","Progress chart"]},
+  {id:89,cat:"education",title:"Rubric Builder for Teachers",price:"₹299/mo",effort:"3 days",audience:"Teachers, professors",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage","jsPDF"],desc:"Build scoring rubrics visually. Drag criteria. Set point values. Print or share.",pain:"Teachers waste hours creating rubrics in Word. Students get inconsistent grading.",features:["Drag criteria builder","Point value setter","Printable PDF rubric","Share link with students"]},
+
+  // ── HEALTH (90–100) ──────────────────────────────────────────────────
+  {id:90,cat:"health",title:"Water Intake Tracker",price:"₹99 one-time",effort:"1 day",audience:"General public",monetize:"One-time",revenue:"Freemium",tech:["React","localStorage","Web Notifications API"],desc:"Log water intake throughout the day. Reminders. Weekly trend chart.",pain:"People forget to drink water. Every 'hydration app' requires login and subscription.",features:["One-tap log","Custom daily goal","Browser notifications","Weekly trend chart"]},
+  {id:91,cat:"health",title:"BMI + Body Fat Estimator",price:"Free/sponsor",effort:"1 day",audience:"General public",monetize:"Sponsor",revenue:"Health affiliate",tech:["Pure HTML/JS"],desc:"Enter height, weight, age, gender → BMI + estimated body fat % with health category.",pain:"BMI calculators don't show body fat. People don't understand what the number means.",features:["BMI + body fat estimate","Health category label","Indian population norms","Improvement tips"]},
+  {id:92,cat:"health",title:"Meal Calorie Estimator (Indian Food)",price:"₹149/mo",effort:"3 days",audience:"Health-conscious Indians",monetize:"Monthly sub",revenue:"Freemium",tech:["React","Claude API","localStorage"],desc:"Enter what you ate (in natural language) → calorie + macro estimate. Indian food database.",pain:"Indian food is underrepresented in global calorie apps. Dal, sabzi, roti have no data.",features:["Natural language input","Indian food DB","Macro breakdown","Daily log history"]},
+  {id:93,cat:"health",title:"Symptom Journal",price:"₹199/mo",effort:"3 days",audience:"Chronic illness patients, caregivers",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage","jsPDF"],desc:"Log daily symptoms, severity, and triggers. PDF report to share with doctor.",pain:"Patients describe symptoms from memory at doctor visits. Inaccurate and missed patterns.",features:["Daily symptom log","Severity slider","Trigger tags","Doctor PDF report"]},
+  {id:94,cat:"health",title:"Medication Reminder (No App)",price:"₹99 one-time",effort:"2 days",audience:"Elderly, patients",monetize:"One-time",revenue:"One-time unlock",tech:["HTML/JS","localStorage","Web Notifications API"],desc:"Add medications and times → browser sends reminders. No app. No login.",pain:"Elderly patients forget medication. Family can't install apps for them.",features:["Medication + time input","Browser push reminders","No login needed","Print schedule"]},
+  {id:95,cat:"health",title:"Workout Plan Generator",price:"₹199/mo",effort:"3 days",audience:"Fitness beginners",monetize:"Monthly sub",revenue:"Freemium",tech:["HTML/JS","Claude API","localStorage"],desc:"Enter goal + equipment + days/week → AI generates a custom workout plan.",pain:"Beginners at gym have no plan. PTs are expensive. Generic plans don't fit schedules.",features:["Goal + equipment input","AI-generated plan","Exercise GIF links","Weekly log tracker"]},
+  {id:96,cat:"health",title:"Period Tracker (Offline)",price:"₹99 one-time",effort:"3 days",audience:"Women",monetize:"One-time",revenue:"Freemium",tech:["React","localStorage"],desc:"Log periods, track cycle, predict next date. 100% offline. No cloud sync.",pain:"Period apps sell user health data. Women want privacy. No offline-first option.",features:["Cycle logging","Prediction algorithm","Symptom tags","100% local only"]},
+  {id:97,cat:"health",title:"Sleep Quality Logger",price:"₹149/mo",effort:"2 days",audience:"Insomniacs, health-conscious",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage","Recharts"],desc:"Log sleep time, wake time, and quality score. Weekly trends. Pattern insights.",pain:"People know they sleep badly but don't track it. No data = no improvement.",features:["Sleep + wake log","Quality slider","Weekly trend chart","AI pattern insight"]},
+  {id:98,cat:"health",title:"Mental Health Check-In",price:"₹149/mo",effort:"2 days",audience:"General public, students",monetize:"Monthly sub",revenue:"Freemium",tech:["React","localStorage","Claude API"],desc:"Daily 2-minute mood and energy check-in. Weekly summary. AI reflection prompt.",pain:"Mental health is tracked nowhere. People don't notice downward spirals until too late.",features:["Mood + energy sliders","Daily check-in habit","Weekly pattern chart","AI reflection prompt"]},
+  {id:99,cat:"health",title:"Posture Break Reminder",price:"Free",effort:"1 day",audience:"WFH workers, students",monetize:"Sponsor",revenue:"Ergonomics affiliate",tech:["Pure JS","Web Notifications API"],desc:"Set a timer → browser reminds you to stand, stretch, and fix posture every X minutes.",pain:"WFH workers sit for 8+ hours without moving. Back problems are an epidemic.",features:["Custom interval timer","Stretch exercise suggestion","Browser notification","No install needed"]},
+  {id:100,cat:"health",title:"First Aid Reference Card",price:"Free/sponsor",effort:"2 days",audience:"Parents, teachers, general public",monetize:"Sponsor",revenue:"Health affiliate",tech:["React","localStorage"],desc:"Offline-first first aid guide for 20 common emergencies. Readable in 10 seconds. Shareable.",pain:"People Google first aid during emergencies. Slow, ads everywhere, wrong info.",features:["20 emergency scenarios","Step-by-step instructions","Works offline (PWA)","Print wallet card"]},
+];
+
+const tagClass = {
+  productivity:"t-productivity",
+  utility:"t-utility",
+  developer:"t-developer",
+  content:"t-content",
+  finance:"t-finance",
+  hr:"t-hr",
+  education:"t-education",
+  health:"t-health"
+};
+
+let currentFilter = 'all';
+let currentSearch = '';
+
+function getVisible(){
+  return IDEAS.filter(i=>{
+    const matchCat = currentFilter==='all' || i.cat===currentFilter;
+    const q = currentSearch.toLowerCase();
+    const matchSearch = !q || i.title.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q) || i.cat.includes(q) || i.tech.join(' ').toLowerCase().includes(q);
+    return matchCat && matchSearch;
+  });
+}
+
+function render(){
+  const grid = document.getElementById('grid');
+  const visible = getVisible();
+  document.getElementById('visible-count').textContent = visible.length;
+  grid.innerHTML = '';
+  if(!visible.length){
+    grid.innerHTML = `<div class="no-results"><div class="no-results-big">404</div><div class="no-results-sub">No ideas match your query. Try a different filter or search term.</div></div>`;
+    return;
+  }
+  visible.forEach((idea,idx)=>{
+    const c = document.createElement('div');
+    c.className='card';
+    c.style.animationDelay=`${Math.min(idx*0.03,0.6)}s`;
+    c.innerHTML=`
+      <div class="card-head">
+        <span class="card-num">${String(idea.id).padStart(2,'0')}</span>
+        <span class="card-tag ${tagClass[idea.cat]}">${idea.cat}</span>
+      </div>
+      <div class="card-title">${idea.title}</div>
+      <div class="card-desc">${idea.desc}</div>
+      <div class="card-footer">
+        <span class="card-price">${idea.price}</span>
+        <span class="card-effort">⚡ ${idea.effort}</span>
+      </div>`;
+    c.addEventListener('click',()=>openModal(idea));
+    grid.appendChild(c);
+  });
+}
+
+function openModal(idea){
+  document.getElementById('m-num').textContent=String(idea.id).padStart(2,'0');
+  document.getElementById('m-tag').innerHTML=`<span class="card-tag ${tagClass[idea.cat]}">${idea.cat}</span>`;
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-title">${idea.title}</div>
+    <div class="modal-desc">${idea.desc}</div>
+    <div class="modal-grid">
+      <div class="modal-kv"><div class="modal-kv-l">Price / Monetize</div><div class="modal-kv-v red">${idea.price}</div></div>
+      <div class="modal-kv"><div class="modal-kv-l">Build Time</div><div class="modal-kv-v">${idea.effort}</div></div>
+      <div class="modal-kv"><div class="modal-kv-l">Target User</div><div class="modal-kv-v blue">${idea.audience}</div></div>
+      <div class="modal-kv"><div class="modal-kv-l">Revenue Model</div><div class="modal-kv-v green">${idea.revenue}</div></div>
+    </div>
+    <div class="modal-section-title">The Pain Point</div>
+    <div class="pain-box">"${idea.pain}"</div>
+    <div class="modal-section-title">Key Features</div>
+    <ul class="feature-list">${idea.features.map(f=>`<li>${f}</li>`).join('')}</ul>
+    <div class="modal-section-title">Tech Stack</div>
+    <div class="tech-row">${idea.tech.map(t=>`<span class="tech-badge">${t}</span>`).join('')}</div>
+  `;
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+document.getElementById('modal-close').addEventListener('click',closeModal);
+document.getElementById('overlay').addEventListener('click',e=>{if(e.target===document.getElementById('overlay'))closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter=btn.dataset.f;
+    render();
+  });
+});
+
+document.getElementById('search').addEventListener('input',e=>{
+  currentSearch=e.target.value;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
