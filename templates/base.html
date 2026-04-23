@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Cognisutra - 100 Micro SaaS Ideas{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Discover and build 100 profitable micro SaaS products using Flask, Tailwind CSS, and modern tech stack.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}micro-saas, tools, productivity, developer tools, flask, tailwind{% endblock %}">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#e8380d',
+                        secondary: '#1b4fd8',
+                        accent: '#1a6b3c'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Manrope', sans-serif; }
+        .font-mono { font-family: 'Space Mono', monospace; }
+        .font-display { font-family: 'Bebas Neue', sans-serif; }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+    </style>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-slate-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="{{ url_for('main.index') }}" class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="text-white font-display font-bold text-lg">C</span>
+                    </div>
+                    <span class="font-display text-xl font-bold hidden sm:inline">COGNISUTRA</span>
+                </a>
+                
+                <!-- Main Menu -->
+                <div class="hidden md:flex gap-8">
+                    <a href="{{ url_for('main.index') }}" class="text-slate-700 hover:text-primary transition">Home</a>
+                    <a href="{{ url_for('main.tools') }}" class="text-slate-700 hover:text-primary transition">Tools</a>
+                    <a href="{{ url_for('main.blogs') }}" class="text-slate-700 hover:text-primary transition">Blogs</a>
+                    <a href="{{ url_for('main.freebies') }}" class="text-slate-700 hover:text-primary transition">Freebies</a>
+                    <a href="{{ url_for('main.pricing') }}" class="text-slate-700 hover:text-primary transition">Pricing</a>
+                    <a href="{{ url_for('main.devspace') }}" class="text-slate-700 hover:text-primary transition">DevSpace</a>
+                </div>
+                
+                <!-- Auth Buttons -->
+                <div class="flex items-center gap-4">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_admin %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="text-slate-700 hover:text-primary transition font-medium">Admin</a>
+                        {% endif %}
+                        <div class="relative group">
+                            <button class="text-slate-700 hover:text-primary transition font-medium">
+                                {{ current_user.username }} ▼
+                            </button>
+                            <div class="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50">
+                                <a href="{{ url_for('main.index') }}" class="block px-4 py-2 text-slate-700 hover:bg-slate-100">Profile</a>
+                                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-slate-700 hover:bg-slate-100">Logout</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="text-slate-700 hover:text-primary transition font-medium">Log In</a>
+                        <a href="{{ url_for('auth.register') }}" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-red-700 transition font-medium">Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                {% for category, message in messages %}
+                    <div class="p-4 rounded-lg bg-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'blue' }}-100 border border-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'blue' }}-300 text-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'blue' }}-700 animate-fade-in">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-300 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="font-display text-white text-lg mb-4">COGNISUTRA</h3>
+                    <p class="text-sm">Discover and build 100 profitable micro SaaS products.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{{ url_for('main.tools') }}" class="hover:text-white transition">Tools</a></li>
+                        <li><a href="{{ url_for('main.blogs') }}" class="hover:text-white transition">Blogs</a></li>
+                        <li><a href="{{ url_for('main.pricing') }}" class="hover:text-white transition">Pricing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{{ url_for('main.about') }}" class="hover:text-white transition">About</a></li>
+                        <li><a href="{{ url_for('main.contact') }}" class="hover:text-white transition">Contact</a></li>
+                        <li><a href="{{ url_for('main.devspace') }}" class="hover:text-white transition">DevSpace</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">Privacy</a></li>
+                        <li><a href="#" class="hover:text-white transition">Terms</a></li>
+                        <li><a href="#" class="hover:text-white transition">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-700 pt-8 flex justify-between items-center">
+                <p class="text-sm">&copy; 2026 Cognisutra. All rights reserved.</p>
+                <div class="flex gap-4">
+                    <a href="#" class="text-slate-400 hover:text-white transition">Twitter</a>
+                    <a href="#" class="text-slate-400 hover:text-white transition">GitHub</a>
+                    <a href="#" class="text-slate-400 hover:text-white transition">LinkedIn</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

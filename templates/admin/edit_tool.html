@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Tool - Admin - Cognisutra{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="font-display text-4xl mb-8">Edit Tool: {{ tool.name }}</h1>
+    
+    <form method="POST" class="bg-white rounded-lg border border-slate-200 p-8 space-y-6">
+        <div class="grid md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Tool Name *</label>
+                <input type="text" name="name" required value="{{ tool.name }}" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Slug *</label>
+                <input type="text" name="slug" required value="{{ tool.slug }}" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary">
+            </div>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Description *</label>
+            <textarea name="description" required rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary">{{ tool.description }}</textarea>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Long Description</label>
+            <textarea name="long_description" rows="5" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary">{{ tool.long_description }}</textarea>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Category *</label>
+                <select name="category" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary">
+                    <option value="">Select Category</option>
+                    <option value="productivity" {% if tool.category == 'productivity' %}selected{% endif %}>Productivity</option>
+                    <option value="content-creation" {% if tool.category == 'content-creation' %}selected{% endif %}>Content Creation</option>
+                    <option value="business" {% if tool.category == 'business' %}selected{% endif %}>Business & Finance</option>
+                    <option value="marketing" {% if tool.category == 'marketing' %}selected{% endif %}>Marketing & Analytics</option>
+                    <option value="sales" {% if tool.category == 'sales' %}selected{% endif %}>Sales & CRM</option>
+                    <option value="education" {% if tool.category == 'education' %}selected{% endif %}>Education</option>
+                    <option value="health" {% if tool.category == 'health' %}selected{% endif %}>Health & Wellness</option>
+                    <option value="development" {% if tool.category == 'development' %}selected{% endif %}>Development</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Price *</label>
+                <input type="text" name="price" required value="{{ tool.price }}" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Revenue Model</label>
+                <input type="text" name="revenue_model" value="{{ tool.revenue_model or '' }}" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary">
+            </div>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Effort (Build Time)</label>
+                <input type="text" name="effort" value="{{ tool.effort or '' }}" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Target Audience</label>
+                <input type="text" name="audience" value="{{ tool.audience or '' }}" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary">
+            </div>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Pain Point</label>
+            <textarea name="pain_point" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary">{{ tool.pain_point or '' }}</textarea>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Demo URL</label>
+                <input type="url" name="demo_url" value="{{ tool.demo_url or '' }}" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">GitHub URL</label>
+                <input type="url" name="github_url" value="{{ tool.github_url or '' }}" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary">
+            </div>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Features (JSON array)</label>
+            <textarea name="features" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary font-mono">{{ tool.features|tojson if tool.features else '[]' }}</textarea>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Tech Stack (JSON array)</label>
+            <textarea name="tech_stack" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary font-mono">{{ tool.tech_stack|tojson if tool.tech_stack else '[]' }}</textarea>
+        </div>
+        
+        <div class="flex items-center gap-2">
+            <input type="checkbox" id="published" name="is_published" {% if tool.is_published %}checked{% endif %}>
+            <label for="published" class="text-sm text-slate-700">Published</label>
+        </div>
+        
+        <div class="flex gap-4 pt-4">
+            <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition">
+                Update Tool
+            </button>
+            <a href="{{ url_for('admin.tools') }}" class="border-2 border-slate-300 text-slate-700 px-6 py-2 rounded-lg font-semibold hover:bg-slate-100 transition">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

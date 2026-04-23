@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}{{ blog.title }} - Cognisutra Blog{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Article Header -->
+    <article>
+        <h1 class="font-display text-5xl mb-4">{{ blog.title }}</h1>
+        <div class="flex items-center gap-4 text-slate-600 mb-8 pb-8 border-b border-slate-200">
+            <span class="font-mono text-sm">{{ blog.published_at.strftime('%B %d, %Y') if blog.published_at }}</span>
+            {% if blog.category %}
+            <span class="bg-primary bg-opacity-10 text-primary text-xs px-3 py-1 rounded-full">{{ blog.category }}</span>
+            {% endif %}
+            {% if blog.author %}
+            <span>By <strong>{{ blog.author }}</strong></span>
+            {% endif %}
+        </div>
+        
+        <!-- Content -->
+        <div class="prose max-w-none mb-12 text-slate-800">
+            {{ blog.content|safe }}
+        </div>
+        
+        <!-- Tags -->
+        {% if blog.tags %}
+        <div class="mb-12 pt-8 border-t border-slate-200">
+            <p class="text-sm text-slate-600 font-mono mb-3">TAGS</p>
+            <div class="flex flex-wrap gap-2">
+                {% for tag in blog.tags %}
+                <a href="{{ url_for('main.blogs', search=tag) }}" class="bg-slate-100 text-slate-700 px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">
+                    {{ tag }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </article>
+    
+    <!-- Recent Articles -->
+    {% if recent_blogs %}
+    <div class="mt-16 pt-12 border-t border-slate-200">
+        <h2 class="font-display text-3xl mb-8">Read Next</h2>
+        <div class="grid md:grid-cols-3 gap-6">
+            {% for recent_blog in recent_blogs %}
+            <a href="{{ url_for('main.blog_detail', blog_id=recent_blog.id) }}" class="bg-white rounded-lg overflow-hidden hover:shadow-lg transition border border-slate-200 group">
+                <div class="h-32 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                    <span class="text-white text-2xl">📝</span>
+                </div>
+                <div class="p-4">
+                    <span class="text-xs text-slate-500 font-mono">{{ recent_blog.published_at.strftime('%b %d, %Y') if recent_blog.published_at }}</span>
+                    <h3 class="font-semibold text-sm mt-2 group-hover:text-primary transition">{{ recent_blog.title }}</h3>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

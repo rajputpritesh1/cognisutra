@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Tools - Admin - Cognisutra{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex justify-between items-center mb-12">
+        <h1 class="font-display text-4xl">Manage Tools</h1>
+        <a href="{{ url_for('admin.create_tool') }}" class="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition">
+            + Create Tool
+        </a>
+    </div>
+    
+    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-slate-50 border-b border-slate-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">#</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Name</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Category</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Price</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">Status</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold text-slate-700">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tool in tools.items %}
+                <tr class="border-b border-slate-200 hover:bg-slate-50">
+                    <td class="px-6 py-4 text-sm text-slate-600">{{ tool.id[:8] }}...</td>
+                    <td class="px-6 py-4 text-sm font-medium text-slate-900">{{ tool.name }}</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">{{ tool.category }}</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">{{ tool.price }}</td>
+                    <td class="px-6 py-4 text-sm">
+                        {% if tool.is_published %}
+                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs">Published</span>
+                        {% else %}
+                        <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs">Draft</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-right space-x-2">
+                        <a href="{{ url_for('admin.edit_tool', tool_id=tool.id) }}" class="text-primary hover:text-red-700">Edit</a>
+                        <form method="POST" action="{{ url_for('admin.delete_tool', tool_id=tool.id) }}" style="display:inline;" onsubmit="return confirm('Delete this tool?');">
+                            <button type="submit" class="text-red-600 hover:text-red-700">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    {% if tools.pages > 1 %}
+    <div class="flex justify-center gap-2 mt-8">
+        {% if tools.has_prev %}
+        <a href="{{ url_for('admin.tools', page=tools.prev_num) }}" class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-100">← Prev</a>
+        {% endif %}
+        
+        {% for page_num in tools.iter_pages() %}
+            {% if page_num %}
+                {% if page_num == tools.page %}
+                <span class="px-4 py-2 bg-primary text-white rounded-lg">{{ page_num }}</span>
+                {% else %}
+                <a href="{{ url_for('admin.tools', page=page_num) }}" class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-100">{{ page_num }}</a>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        
+        {% if tools.has_next %}
+        <a href="{{ url_for('admin.tools', page=tools.next_num) }}" class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-100">Next →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

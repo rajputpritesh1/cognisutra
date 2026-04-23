@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}DevSpace - Developer Resources - Cognisutra{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="font-display text-5xl mb-4">DevSpace</h1>
+    <p class="text-xl text-slate-600 mb-12">Everything developers need to build and deploy Cognisutra</p>
+    
+    <div class="grid md:grid-cols-2 gap-12">
+        <!-- Documentation -->
+        <section class="bg-white rounded-lg p-8 border border-slate-200">
+            <h2 class="font-display text-2xl mb-4">📖 Documentation</h2>
+            <p class="text-slate-700 mb-6">Complete API documentation, guides, and examples for developers.</p>
+            <ul class="space-y-2">
+                <li><a href="#" class="text-primary hover:text-red-700">API Reference</a></li>
+                <li><a href="#" class="text-primary hover:text-red-700">Getting Started Guide</a></li>
+                <li><a href="#" class="text-primary hover:text-red-700">Authentication</a></li>
+                <li><a href="#" class="text-primary hover:text-red-700">Rate Limiting</a></li>
+            </ul>
+        </section>
+        
+        <!-- GitHub -->
+        <section class="bg-white rounded-lg p-8 border border-slate-200">
+            <h2 class="font-display text-2xl mb-4">🐙 GitHub</h2>
+            <p class="text-slate-700 mb-6">Open source repositories and code examples.</p>
+            <ul class="space-y-2">
+                <li><a href="#" class="text-primary hover:text-red-700">Main Repository</a></li>
+                <li><a href="#" class="text-primary hover:text-red-700">CLI Tools</a></li>
+                <li><a href="#" class="text-primary hover:text-red-700">SDK (Python, Node, Go)</a></li>
+                <li><a href="#" class="text-primary hover:text-red-700">Examples</a></li>
+            </ul>
+        </section>
+        
+        <!-- Deployment -->
+        <section class="bg-white rounded-lg p-8 border border-slate-200">
+            <h2 class="font-display text-2xl mb-4">🚀 Deployment</h2>
+            <p class="text-slate-700 mb-6">Deploy to Vercel, AWS, or your own servers.</p>
+            <ul class="space-y-2">
+                <li><a href="#" class="text-primary hover:text-red-700">Vercel Deployment</a></li>
+                <li><a href="#" class="text-primary hover:text-red-700">Docker Setup</a></li>
+                <li><a href="#" class="text-primary hover:text-red-700">AWS Guide</a></li>
+                <li><a href="#" class="text-primary hover:text-red-700">CI/CD Pipeline</a></li>
+            </ul>
+        </section>
+        
+        <!-- Community -->
+        <section class="bg-white rounded-lg p-8 border border-slate-200">
+            <h2 class="font-display text-2xl mb-4">👥 Community</h2>
+            <p class="text-slate-700 mb-6">Connect with other developers and get help.</p>
+            <ul class="space-y-2">
+                <li><a href="#" class="text-primary hover:text-red-700">Discord Community</a></li>
+                <li><a href="#" class="text-primary hover:text-red-700">GitHub Discussions</a></li>
+                <li><a href="#" class="text-primary hover:text-red-700">Stack Overflow Tag</a></li>
+                <li><a href="#" class="text-primary hover:text-red-700">Report Issues</a></li>
+            </ul>
+        </section>
+    </div>
+    
+    <div class="mt-12 bg-gradient-to-r from-secondary to-accent text-white rounded-lg p-12 text-center">
+        <h2 class="font-display text-3xl mb-4">Ready to Contribute?</h2>
+        <p class="text-lg mb-6">Help us build Cognisutra. We welcome contributions of all kinds.</p>
+        <a href="#" class="bg-white text-secondary px-8 py-3 rounded-lg font-semibold hover:bg-slate-100 transition inline-block">
+            Contribute on GitHub
+        </a>
+    </div>
+</div>
+{% endblock %}

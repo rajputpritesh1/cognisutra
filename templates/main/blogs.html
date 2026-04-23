@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Blogs - Cognisutra{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="font-display text-5xl mb-4">Blog</h1>
+    <p class="text-xl text-slate-600 mb-12">Learn how to build profitable micro SaaS products</p>
+    
+    <div class="grid md:grid-cols-3 gap-8">
+        {% for blog in blogs.items %}
+        <a href="{{ url_for('main.blog_detail', blog_id=blog.id) }}" class="bg-white rounded-lg overflow-hidden hover:shadow-lg transition border border-slate-200 group">
+            <div class="h-40 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                <span class="text-white text-3xl">📝</span>
+            </div>
+            <div class="p-6">
+                <span class="text-xs text-slate-500 font-mono">{{ blog.published_at.strftime('%b %d, %Y') if blog.published_at }}</span>
+                <h3 class="font-semibold text-lg mt-2 group-hover:text-primary transition">{{ blog.title }}</h3>
+                <p class="text-slate-600 text-sm mt-3">{{ blog.excerpt }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    
+    {% if blogs.pages > 1 %}
+    <div class="flex justify-center gap-2 mt-12">
+        {% if blogs.has_prev %}
+        <a href="{{ url_for('main.blogs', page=blogs.prev_num) }}" class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-100 transition">← Prev</a>
+        {% endif %}
+        
+        {% for page_num in blogs.iter_pages() %}
+            {% if page_num %}
+                {% if page_num == blogs.page %}
+                <span class="px-4 py-2 bg-primary text-white rounded-lg">{{ page_num }}</span>
+                {% else %}
+                <a href="{{ url_for('main.blogs', page=page_num) }}" class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-100 transition">{{ page_num }}</a>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        
+        {% if blogs.has_next %}
+        <a href="{{ url_for('main.blogs', page=blogs.next_num) }}" class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-100 transition">Next →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Cognisutra - 100 Micro SaaS Ideas & Tools{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div class="animate-fade-in">
+                <h1 class="font-display text-5xl md:text-6xl mb-4 leading-tight">
+                    Build Your Next <span class="text-primary">Micro SaaS</span>
+                </h1>
+                <p class="text-xl text-slate-300 mb-6">
+                    Discover 100 profitable micro SaaS ideas with detailed guides, free tools, and expert insights. Ship your first product in weeks, not months.
+                </p>
+                <div class="flex gap-4">
+                    <a href="{{ url_for('main.tools') }}" class="bg-primary hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold transition">
+                        Explore 100 Tools
+                    </a>
+                    <a href="{{ url_for('main.blogs') }}" class="border-2 border-white hover:bg-white hover:text-slate-900 text-white px-8 py-3 rounded-lg font-semibold transition">
+                        Read Guides
+                    </a>
+                </div>
+            </div>
+            <div class="hidden md:block">
+                <div class="bg-primary bg-opacity-20 rounded-lg p-8 backdrop-blur-sm">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                            <span>100 Verified Micro SaaS Ideas</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                            <span>Market Research Backed</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                            <span>Flask + Tailwind Stack</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                            <span>Zero Hidden Costs</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Section -->
+<div class="bg-white border-b border-slate-200 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+                <div class="font-display text-4xl text-primary font-bold mb-2">100</div>
+                <p class="text-slate-600">Micro SaaS Ideas</p>
+            </div>
+            <div>
+                <div class="font-display text-4xl text-secondary font-bold mb-2">8</div>
+                <p class="text-slate-600">Categories</p>
+            </div>
+            <div>
+                <div class="font-display text-4xl text-accent font-bold mb-2">50+</div>
+                <p class="text-slate-600">Free Tools</p>
+            </div>
+            <div>
+                <div class="font-display text-4xl text-blue-600 font-bold mb-2">∞</div>
+                <p class="text-slate-600">Revenue Potential</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Tools -->
+<div class="py-20 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="font-display text-4xl mb-12">Featured Tools</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            {% for tool in featured_tools %}
+            <a href="{{ url_for('main.tool_detail', tool_id=tool.id) }}" class="bg-white rounded-lg p-6 hover:shadow-lg transition border border-slate-200 group">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="bg-slate-100 text-slate-700 text-xs px-3 py-1 rounded-full font-mono">{{ tool.category }}</span>
+                </div>
+                <h3 class="font-semibold text-lg mb-2 group-hover:text-primary transition">{{ tool.name }}</h3>
+                <p class="text-slate-600 text-sm mb-4">{{ tool.description }}</p>
+                <div class="flex justify-between items-end">
+                    <span class="text-primary font-semibold">{{ tool.price }}</span>
+                    <span class="text-slate-500 text-xs">⚡ {{ tool.effort }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-12">
+            <a href="{{ url_for('main.tools') }}" class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-700 transition inline-block">
+                View All 100 Tools →
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Blogs -->
+<div class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="font-display text-4xl mb-12">Latest Blog Posts</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            {% for blog in recent_blogs %}
+            <a href="{{ url_for('main.blog_detail', blog_id=blog.id) }}" class="bg-white rounded-lg overflow-hidden hover:shadow-lg transition border border-slate-200 group">
+                <div class="h-48 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                    <span class="text-white text-4xl">📝</span>
+                </div>
+                <div class="p-6">
+                    <span class="text-xs text-slate-500 font-mono">{{ blog.published_at.strftime('%b %d, %Y') if blog.published_at }}</span>
+                    <h3 class="font-semibold text-lg mt-2 group-hover:text-primary transition">{{ blog.title }}</h3>
+                    <p class="text-slate-600 text-sm mt-3">{{ blog.excerpt }}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-12">
+            <a href="{{ url_for('main.blogs') }}" class="text-primary font-semibold hover:text-red-700 transition">
+                Read All Blogs →
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="bg-gradient-to-r from-primary to-secondary text-white py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="font-display text-4xl mb-4">Ready to Build?</h2>
+        <p class="text-xl mb-8 opacity-90">
+            Join thousands of founders building profitable micro SaaS products. Start with our free tools and guides.
+        </p>
+        {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('auth.register') }}" class="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-slate-100 transition inline-block">
+            Sign Up for Free
+        </a>
+        {% else %}
+        <a href="{{ url_for('main.tools') }}" class="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-slate-100 transition inline-block">
+            Explore Tools
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

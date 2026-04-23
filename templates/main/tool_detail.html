@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tool.name }} - Cognisutra{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Header -->
+    <div class="mb-8 flex justify-between items-start">
+        <div>
+            <span class="bg-primary bg-opacity-10 text-primary text-xs px-3 py-1 rounded-full font-mono">{{ tool.category }}</span>
+            <h1 class="font-display text-5xl mt-4 mb-2">{{ tool.name }}</h1>
+            <p class="text-xl text-slate-600">{{ tool.description }}</p>
+        </div>
+        {% if current_user.is_authenticated %}
+        <button class="bookmark-btn" data-tool-id="{{ tool.id }}" data-bookmarked="{{ bookmarked|lower }}">
+            <span class="text-3xl">{% if bookmarked %}❤️{% else %}🤍{% endif %}</span>
+        </button>
+        {% endif %}
+    </div>
+    
+    <!-- Pricing & Details -->
+    <div class="grid md:grid-cols-4 gap-4 mb-12 bg-slate-50 p-6 rounded-lg">
+        <div>
+            <p class="text-sm text-slate-600 font-mono">Price</p>
+            <p class="font-display text-2xl text-primary">{{ tool.price }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-slate-600 font-mono">Build Time</p>
+            <p class="font-display text-2xl">⚡ {{ tool.effort }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-slate-600 font-mono">Revenue Model</p>
+            <p class="font-semibold">{{ tool.revenue_model }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-slate-600 font-mono">Target Audience</p>
+            <p class="font-semibold">{{ tool.audience }}</p>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="grid md:grid-cols-3 gap-12">
+        <div class="md:col-span-2 space-y-12">
+            <!-- The Problem -->
+            <section>
+                <h2 class="font-display text-2xl mb-4">The Problem</h2>
+                <p class="bg-slate-50 p-6 rounded-lg text-lg text-slate-800 border-l-4 border-primary">
+                    "{{ tool.pain_point }}"
+                </p>
+            </section>
+            
+            <!-- Features -->
+            {% if tool.features %}
+            <section>
+                <h2 class="font-display text-2xl mb-4">Key Features</h2>
+                <ul class="space-y-3">
+                    {% for feature in tool.features %}
+                    <li class="flex gap-3">
+                        <span class="text-primary">✓</span>
+                        <span class="text-lg">{{ feature }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            {% endif %}
+            
+            <!-- Tech Stack -->
+            {% if tool.tech_stack %}
+            <section>
+                <h2 class="font-display text-2xl mb-4">Tech Stack</h2>
+                <div class="flex flex-wrap gap-2">
+                    {% for tech in tool.tech_stack %}
+                    <span class="bg-slate-100 text-slate-700 px-4 py-2 rounded-full text-sm font-mono">{{ tech }}</span>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <aside class="bg-slate-50 rounded-lg p-6 border border-slate-200 h-fit space-y-6">
+            {% if tool.demo_url %}
+            <a href="{{ tool.demo_url }}" target="_blank" rel="noopener noreferrer" class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition block text-center">
+                View Demo
+            </a>
+            {% endif %}
+            
+            {% if tool.github_url %}
+            <a href="{{ tool.github_url }}" target="_blank" rel="noopener noreferrer" class="w-full bg-slate-900 text-white py-3 rounded-lg font-semibold hover:bg-slate-800 transition block text-center">
+                GitHub
+            </a>
+            {% endif %}
+            
+            <div class="space-y-2 pt-6 border-t border-slate-200">
+                <p class="text-sm text-slate-600 font-mono">METADATA</p>
+                <div>
+                    <p class="text-xs text-slate-500">Category</p>
+                    <p class="font-semibold text-slate-900">{{ tool.category.title() }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-500">Build Effort</p>
+                    <p class="font-semibold text-slate-900">{{ tool.effort }}</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bookmarkBtn = document.querySelector('.bookmark-btn');
+    if (bookmarkBtn) {
+        bookmarkBtn.addEventListener('click', async function() {
+            const toolId = this.dataset.toolId;
+            const response = await fetch(`/tools/${toolId}/bookmark`, { method: 'POST' });
+            const data = await response.json();
+            this.dataset.bookmarked = data.bookmarked;
+            this.innerHTML = data.bookmarked ? '<span class="text-3xl">❤️</span>' : '<span class="text-3xl">🤍</span>';
+        });
+    }
+});
+</script>
+{% endblock %}

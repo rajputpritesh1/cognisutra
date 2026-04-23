@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Cognisutra{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="font-display text-4xl mb-12">Admin Dashboard</h1>
+    
+    <!-- Stats Grid -->
+    <div class="grid md:grid-cols-5 gap-4 mb-12">
+        <div class="bg-white rounded-lg p-6 border border-slate-200">
+            <p class="text-slate-600 text-sm font-mono">Total Users</p>
+            <p class="font-display text-3xl mt-2">{{ total_users }}</p>
+        </div>
+        <div class="bg-white rounded-lg p-6 border border-slate-200">
+            <p class="text-slate-600 text-sm font-mono">Total Tools</p>
+            <p class="font-display text-3xl mt-2">{{ total_tools }}</p>
+        </div>
+        <div class="bg-white rounded-lg p-6 border border-slate-200">
+            <p class="text-slate-600 text-sm font-mono">Total Blogs</p>
+            <p class="font-display text-3xl mt-2">{{ total_blogs }}</p>
+        </div>
+        <div class="bg-white rounded-lg p-6 border border-slate-200">
+            <p class="text-slate-600 text-sm font-mono">Active Subscriptions</p>
+            <p class="font-display text-3xl mt-2 text-accent">{{ active_subscriptions }}</p>
+        </div>
+        <div class="bg-white rounded-lg p-6 border border-slate-200">
+            <p class="text-slate-600 text-sm font-mono">Unread Messages</p>
+            <p class="font-display text-3xl mt-2 text-primary">{{ unread_messages }}</p>
+        </div>
+    </div>
+    
+    <!-- Admin Menu -->
+    <div class="grid md:grid-cols-4 gap-6">
+        <a href="{{ url_for('admin.tools') }}" class="bg-white rounded-lg p-8 hover:shadow-lg transition border border-slate-200 group">
+            <h3 class="font-display text-2xl mb-2 group-hover:text-primary transition">🛠️</h3>
+            <p class="font-semibold text-lg mb-2">Tools</p>
+            <p class="text-slate-600 text-sm">Manage all micro SaaS tools</p>
+        </a>
+        
+        <a href="{{ url_for('admin.blogs') }}" class="bg-white rounded-lg p-8 hover:shadow-lg transition border border-slate-200 group">
+            <h3 class="font-display text-2xl mb-2 group-hover:text-primary transition">📝</h3>
+            <p class="font-semibold text-lg mb-2">Blogs</p>
+            <p class="text-slate-600 text-sm">Create and manage blog posts</p>
+        </a>
+        
+        <a href="{{ url_for('admin.users') }}" class="bg-white rounded-lg p-8 hover:shadow-lg transition border border-slate-200 group">
+            <h3 class="font-display text-2xl mb-2 group-hover:text-primary transition">👥</h3>
+            <p class="font-semibold text-lg mb-2">Users</p>
+            <p class="text-slate-600 text-sm">Manage user accounts and roles</p>
+        </a>
+        
+        <a href="{{ url_for('admin.messages') }}" class="bg-white rounded-lg p-8 hover:shadow-lg transition border border-slate-200 group">
+            <h3 class="font-display text-2xl mb-2 group-hover:text-primary transition">💬</h3>
+            <p class="font-semibold text-lg mb-2">Messages</p>
+            <p class="text-slate-600 text-sm">View contact form submissions</p>
+        </a>
+    </div>
+</div>
+{% endblock %}
